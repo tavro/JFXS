@@ -13,21 +13,18 @@ import javax.swing.*;
  */
 public class DebugText extends JComponent {
 	
-	private int _x;   
-	private int _y;     
+	private Vector2 _position;  
 	private char[] _symbols;        //Basically a String
 	private Color _color;    
 	
 	/**
      * Constructor      
      * @param String text, text to print in JFrame      
-     * @param int x, pixel x-position of text in JFrame      
-     * @param int y, pixel y-position of text in JFrame  
+     * @param Vector2 position, position of text in JFrame  
      * @param Color color, color of text    
      */
-	public DebugText(String text, int x, int y, Color color) {
-		_x = x;
-		_y = y;
+	public DebugText(String text, Vector2 position, Color color) {
+		_position = position;
 		_color = color;
 		_symbols = text.toCharArray();
 	}
@@ -36,6 +33,6 @@ public class DebugText extends JComponent {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g.setColor(_color);
-		g.drawChars(_symbols, 0, _symbols.length, _x, _y+12);
+		g.drawChars(_symbols, 0, _symbols.length, _position.getX(), _position.getY()+12);
 	}
 }

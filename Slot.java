@@ -17,8 +17,7 @@ import javax.swing.*;
  * @author Isak Horvath  
  */
 public class Slot extends JComponent {
-	private int _x;   
-	private int _y;  
+	private Vector2 _position;
 	private int _width;     
 	private int _height;
 	private Color _color;      
@@ -29,8 +28,7 @@ public class Slot extends JComponent {
 	
 	/**
      * Constructor      
-     * @param int x, x-position of slot in JFrame      
-     * @param int y, y-position of slot in JFrame    
+     * @param Vector2 position, position of slot in JFrame      
      * @param int width, width of slot in pixels 
      * @param int height, height of slot in pixels    
      * @param char[] symbols, amount of items in slot
@@ -38,9 +36,8 @@ public class Slot extends JComponent {
      * @param Image image, image representing item
      * @param boolean isSelected, tells if the slot is selected or not  
      */
-	public Slot(int x, int y, int width, int height, char[] symbols, Color color, Image image, boolean isSelected) {
-		_x = x;
-		_y = y;
+	public Slot(Vector2 position, int width, int height, char[] symbols, Color color, Image image, boolean isSelected) {
+		_position = position;
 		_width = width;
 		_height = height;
 		_color = color;
@@ -58,14 +55,14 @@ public class Slot extends JComponent {
 		g.setColor(_color);
 		
 		if(_img != null) {
-			g.drawImage(_img, _x, _y, getFocusCycleRootAncestor());
+			g.drawImage(_img, _position.getX(), _position.getY(), getFocusCycleRootAncestor());
 		}
 		
 		if(_isSelected) {
 			g.setColor(Color.RED);
 		}
-		g.drawRect(_x, _y, _width, _height);
+		g.drawRect(_position.getX(), _position.getY(), _width, _height);
 		g.setColor(Color.BLACK);
-		g.drawChars(_symbols, 0, _symbols.length, _x+24, _y+12);
+		g.drawChars(_symbols, 0, _symbols.length, _position.getX()+24, _position.getY()+12);
 	}
 }

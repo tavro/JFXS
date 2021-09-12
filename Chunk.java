@@ -18,15 +18,15 @@ public class Chunk {
 	public static final int WIDTH = 10;        			//chunk width (in tiles)
 	public static final int HEIGHT = 10;        		//chunk height (in tiles)
 	
-	private static final double WALL_HEIGHT = 0.5;      //where in noise walls start to appear
-	private static final double WATER_HEIGHT = -0.35;   //where in noise water start to appear
+	private static final double WALL_HEIGHT = 0.75;      //where in noise walls start to appear
+	private static final double WATER_HEIGHT = -0.55;   //where in noise water start to appear
 	
 	public static final String PATH_PREFIX = "src/";        
 	public static final String PATH_SUFFIX = ".png";        //used for getting png images
 	
 	/* file names */
 	public static final String WALL_IMG = "wall";        	
-	public static final String GROUND_IMG = "grass";      
+	public static final String GROUND_IMG = "ground";      
 	public static final String WATER_IMG = "water";     
 	Tile[][] map = new Tile[WIDTH][HEIGHT];      
 	
@@ -116,7 +116,7 @@ public class Chunk {
 					Tile t = getTile(xPos, yPos);
 					if(t.getTileType() == TileType.WALL) {
 						removeTile(xPos, yPos);
-						players.get(0)._inventory.addItem(new Item("Stone", "Used for crafting.", "src/test.png"));
+						players.get(0)._inventory.addItem(new Item("Stone", "Used for crafting.", "src/stone.png"));
 					}
 				}
 				removeTile((int)players.get(0).getLastPosition().getX(), (int)players.get(0).getLastPosition().getY());
@@ -169,7 +169,7 @@ public class Chunk {
 				int yPos = (int)player.getPosition().getY();
 				Vector2 pos = new Vector2(xPos, yPos);
 				
-				Image image = getImage(PATH_PREFIX + "test" + PATH_SUFFIX);
+				Image image = getImage(PATH_PREFIX + "player" + PATH_SUFFIX);
 				Tile tile = new Tile(pos, true, TileType.PLAYER, image);
 				setTile(tile);
 			}
