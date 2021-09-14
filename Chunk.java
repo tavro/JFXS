@@ -18,7 +18,8 @@ public class Chunk {
 	public static final int WIDTH = 10;        			//chunk width (in tiles)
 	public static final int HEIGHT = 10;        		//chunk height (in tiles)
 	
-	private static final double WALL_HEIGHT = 0.75;      //where in noise walls start to appear
+	private static final double TREE_HEIGHT = 0.75;      //where in noise trees start to appear
+	private static final double WALL_HEIGHT = 0.85;      //where in noise walls start to appear
 	private static final double WATER_HEIGHT = -0.55;   //where in noise water start to appear
 	
 	public static final String PATH_PREFIX = "src/";        
@@ -27,10 +28,12 @@ public class Chunk {
 	/* file names */
 	public static final String WALL_IMG = "wall";        	
 	public static final String GROUND_IMG = "ground";      
-	public static final String WATER_IMG = "water";     
+	public static final String WATER_IMG = "water"; 
+	public static final String TREE_IMG = "player";
+	
 	Tile[][] map = new Tile[WIDTH][HEIGHT];      
 	
-	List<Player> players = new ArrayList<Player>();      
+	private Player player;      
 	
 	/**
      * Constructor      
@@ -58,6 +61,10 @@ public class Chunk {
 				else if(noise >= WALL_HEIGHT) {
 					Image img = getImage(PATH_PREFIX + WALL_IMG + PATH_SUFFIX);
 					map[x][y] = new Tile(pos, true, TileType.WALL, img);
+				}
+				else if(noise >= TREE_HEIGHT) {
+					Image img = getImage(PATH_PREFIX + TREE_IMG + PATH_SUFFIX);
+					map[x][y] = new Tile(pos, true, TileType.TREE, img);
 				}
 				else {
 					Image img = getImage(PATH_PREFIX + GROUND_IMG + PATH_SUFFIX);
@@ -87,7 +94,7 @@ public class Chunk {
      * updates player positions
      */
 	public void updateMap() {
-		updatePlayerPositions();
+		updatePlayerPosition();
 	}
 	
 	/**
@@ -112,16 +119,23 @@ public class Chunk {
 		}
 		else {
 			if(tile.getTileType() == TileType.PLAYER) {
-				if(players.get(0)._inventory.getSelectedItem() == "Pickaxe") {
+				if(player._inventory.getSelectedItem() == "Pickaxe") {
 					Tile t = getTile(xPos, yPos);
 					if(t.getTileType() == TileType.WALL) {
 						removeTile(xPos, yPos);
-						players.get(0)._inventory.addItem(new Item("Stone", "Used for crafting.", "src/stone.png"));
+						player._inventory.addItem(new Item("Stone", "Used for crafting.", "src/stone.png"));
 					}
 				}
-				removeTile((int)players.get(0).getLastPosition().getX(), (int)players.get(0).getLastPosition().getY());
-				players.get(0).move((int)players.get(0).getLastPosition().getX() - xPos, (int)players.get(0).getLastPosition().getY() - yPos);
-				updatePlayerPositions();
+				else if(player._inventory.getSelectedItem() == "Axe") {
+					Tile t = getTile(xPos, yPos);
+					if(t.getTileType() == TileType.TREE) {
+						removeTile(xPos, yPos);
+						player._inventory.addItem(new Item("Wood", "Used for building.", "src/wood.png"));
+					}
+				}
+				removeTile(player.getLastPosition().getX(), player.getLastPosition().getY());
+				player.move(player.getLastPosition().getX() - xPos, player.getLastPosition().getY() - yPos);
+				updatePlayerPosition();
 			}
 		}
 	}
@@ -150,29 +164,35 @@ public class Chunk {
 	}
 	
 	/**
-     * Method addPlayer
-     * @param Player player, adds player to chunk
+     * Setter setPlayer
+     * @param Player p, adds player to chunk
      */
-	public void addPlayer(Player player) {
-		players.add(player);
+	public void setPlayer(Player p) {
+		player = p;
+	}
+	
+	/**
+     * Getter getPlayer
+     * gets player
+     */
+	public Player getPlayer() {
+		return player;
 	}
 	
 	/**
      * Method updatePlayerPositions
      * updates player positions
      */
-	public void updatePlayerPositions() {
-		if (players.size()>0) {
+	public void updatePlayerPosition() {
+		if (player != null) {
 			removeTilesFromMap(TileType.PLAYER);
-			for(Player player : players) {
-				int xPos = (int)player.getPosition().getX();
-				int yPos = (int)player.getPosition().getY();
-				Vector2 pos = new Vector2(xPos, yPos);
+			int xPos = (int)player.getPosition().getX();
+			int yPos = (int)player.getPosition().getY();
+			Vector2 pos = new Vector2(xPos, yPos);
 				
-				Image image = getImage(PATH_PREFIX + "player" + PATH_SUFFIX);
-				Tile tile = new Tile(pos, true, TileType.PLAYER, image);
-				setTile(tile);
-			}
+			Image image = getImage(PATH_PREFIX + "player" + PATH_SUFFIX);
+			Tile tile = new Tile(pos, true, TileType.PLAYER, image);
+			setTile(tile);
 		}
 	}
 	

@@ -10,5 +10,6 @@ public enum TileType {
 	WATER,
 	WALL,
 	GROUND,
-	PLAYER
+	PLAYER,
+	TREE
 }

@@ -59,33 +59,33 @@ public class World {
 	}
 	
 	public void updateCurrentChunkX(Direction direction) {
+		Player player = getCurrentChunk().getPlayer();
 		if(direction == Direction.RIGHT) {
-			getCurrentChunk().players.get(0).getPosition().setX(0);
-			Player player = getCurrentChunk().players.remove(0);
+			player.getPosition().setX(0);
+			getCurrentChunk().setPlayer(null);
 			increaseCurrentChunkPositionX();
-			getCurrentChunk().players.add(player);
 		}
 		else if(direction == Direction.LEFT) {
-			getCurrentChunk().players.get(0).getPosition().setX(Chunk.WIDTH-1);
-			Player player = getCurrentChunk().players.remove(0);
+			getCurrentChunk().getPlayer().getPosition().setX(Chunk.WIDTH-1);
+			getCurrentChunk().setPlayer(null);
 			decreaseCurrentChunkPositionX();
-			getCurrentChunk().players.add(player);
 		}
+		getCurrentChunk().setPlayer(player);
 	}
 	
 	public void updateCurrentChunkY(Direction direction) {
+		Player player = getCurrentChunk().getPlayer();
 		if(direction==Direction.UP) {
-			getCurrentChunk().players.get(0).getPosition().setY(0);
-			Player player = getCurrentChunk().players.remove(0);
+			player.getPosition().setY(0);
+			getCurrentChunk().setPlayer(null);
 			increaseCurrentChunkPositionY();
-			getCurrentChunk().players.add(player);
 		}
 		else if(direction==Direction.DOWN) {
-			getCurrentChunk().players.get(0).getPosition().setY(Chunk.HEIGHT-1);
-			Player player = getCurrentChunk().players.remove(0);
+			getCurrentChunk().getPlayer().getPosition().setY(Chunk.HEIGHT-1);
+			getCurrentChunk().setPlayer(null);
 			decreaseCurrentChunkPositionY();
-			getCurrentChunk().players.add(player);
 		}
+		getCurrentChunk().setPlayer(player);
 	}
 	
 	/**

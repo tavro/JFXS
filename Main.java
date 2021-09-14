@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Image;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
@@ -30,7 +31,7 @@ public class Main {
 		Vector2 startWorldPosition = new Vector2(0,0);
 		
 		World world = new World(startWorldPosition);
-		world.getChunk(world.getCurrentChunkPosition()).addPlayer(player);
+		world.getChunk(world.getCurrentChunkPosition()).setPlayer(player);
 		
 		JFrame frame = new JFrame("Sandbox");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -103,7 +104,9 @@ public class Main {
 	    
 	    Notification notis = null;
 	    int currentInventorySlot = -1;
-	    int lastInventorySlot = -2;
+	    
+	    int lastMouseX = -1;
+	    int lastMouseY = -1;
 	    
 	    while(true) {
 	    	
@@ -115,22 +118,33 @@ public class Main {
 	        
 	        if (isOverInventory(x,y)) {
 	        	currentInventorySlot = getSlotIndex(x);
-	        	if(lastInventorySlot != currentInventorySlot) {
+	        	if(lastMouseX != x || lastMouseY != y) {
 	        		if(notis != null) {	        			
 		        		frame.remove(notis);
 		        		notis = null;
 	        		}
 	        	}
 	        	if(notis == null) {
-	        		notis = new Notification(new Vector2(x,y), "Inventory Slot " + currentInventorySlot, "This is a test.");
-	        		
-	        		lastInventorySlot = currentInventorySlot;
-		        	
-	        		frame.add(notis);
-		        	frame.pack();
+	        		int inventorySize = world.getCurrentChunk().getPlayer()._inventory.items.size();
+	        		if(inventorySize >= currentInventorySlot + 1) {
+	        			Item item = world.getCurrentChunk().getPlayer()._inventory.realItems.get(inventorySize - 1 - currentInventorySlot);
+		        		notis = new Notification(new Vector2(x,y),  item.getName(), item.getDescription());
+		        		
+		        		lastMouseX = x;
+		        		lastMouseY = y;
+			        	
+		        		frame.add(notis);
+			        	frame.pack();
+	        		}
+	        	}
+	        } else {
+	        	if(notis != null) {
+	        		frame.remove(notis);
+	        		frame.pack();
+	        		frame.repaint();
+	        		notis = null;
 	        	}
 	        }
-	        
 	    }
 	}
 	
@@ -209,11 +223,11 @@ public class Main {
 		Chunk chunk = world.getCurrentChunk();
 	    final int UI_SAFEZONE = 11;
 		
-	    DebugText debugLastPosX = new DebugText("Last Player X Pos:" + chunk.players.get(0).getLastPosition().getX(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,16),TEXT_COLOR);
-	    DebugText debugLastPosY = new DebugText("Last Player Y Pos:" + chunk.players.get(0).getLastPosition().getY(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,32),TEXT_COLOR);
+	    DebugText debugLastPosX = new DebugText("Last Player X Pos:" + chunk.getPlayer().getLastPosition().getX(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,16),TEXT_COLOR);
+	    DebugText debugLastPosY = new DebugText("Last Player Y Pos:" + chunk.getPlayer().getLastPosition().getY(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,32),TEXT_COLOR);
 	    
-	    DebugText debugPosX = new DebugText("Player X Pos:" + chunk.players.get(0).getPosition().getX(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,48),TEXT_COLOR);
-	    DebugText debugPosY = new DebugText("Player Y Pos:" + chunk.players.get(0).getPosition().getY(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,64),TEXT_COLOR);
+	    DebugText debugPosX = new DebugText("Player X Pos:" + chunk.getPlayer().getPosition().getX(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,48),TEXT_COLOR);
+	    DebugText debugPosY = new DebugText("Player Y Pos:" + chunk.getPlayer().getPosition().getY(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,64),TEXT_COLOR);
 	    
 	    DebugText debugChunkPosX = new DebugText("Chunk X Pos:" + world.getCurrentChunkPosition().getX(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,80),TEXT_COLOR);
 	    DebugText debugChunkPosY = new DebugText("Chunk Y Pos:" + world.getCurrentChunkPosition().getY(), new Vector2(SCALE_FACTOR*UI_SAFEZONE,96),TEXT_COLOR);
@@ -239,7 +253,7 @@ public class Main {
 	    	}
 	    }
 	    
-	    drawInventory(frame, chunk.players.get(0));
+	    drawInventory(frame, chunk.getPlayer());
 	}
 	
 	public static void addDebugText(JFrame frame, DebugText text) {

@@ -1,5 +1,7 @@
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +15,8 @@ import java.util.Map;
 public class Container {
 	private int _maxAmount;        
 	private int _selectedItemIndex;        //position of active item
+	
+	List<Item> realItems = new ArrayList<Item>();
 	Map<String, Integer> items;            //map item names to amount of specified item
 	
 	/**
@@ -36,6 +40,7 @@ public class Container {
 		}
 		else {
 			if(items.size() < _maxAmount) {
+				realItems.add(item);
 				items.put(item.getName(), 1);
 			}
 		}
