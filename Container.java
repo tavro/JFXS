@@ -90,4 +90,15 @@ public class Container {
 		}
 		return null;
 	}
+	
+	public boolean isOver(int x, int y) {
+		if((x >= 0 && x <= 322) && (y >= 320 && y <= 352)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public int getSlotIndex(int x) {
+		return (int)Math.floor(x/32.0f);
+	}
 }

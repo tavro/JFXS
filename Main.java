@@ -77,11 +77,12 @@ public class Main {
             	    System.out.println(event.getKeyChar());
             	}
             	
+            	Container inventory = player.getInventory();
             	if(event.getKeyCode()==37) {
-            		player._inventory.selectItem(player._inventory.getSelectedItemIndex() - 1);
+            		inventory.selectItem(inventory.getSelectedItemIndex() - 1);
             	}
             	else if(event.getKeyCode()==39) {
-            		player._inventory.selectItem(player._inventory.getSelectedItemIndex() + 1);
+            		inventory.selectItem(inventory.getSelectedItemIndex() + 1);
             	}
             	
                 world.getChunk(world.getCurrentChunkPosition()).updateMap();
@@ -116,8 +117,9 @@ public class Main {
 	        int x = (int) b.getX();
 	        int y = (int) b.getY();
 	        
-	        if (isOverInventory(x,y)) {
-	        	currentInventorySlot = getSlotIndex(x);
+	        Container inventory = world.getCurrentChunk().getPlayer().getInventory();
+	        if (inventory.isOver(x,y)) {
+	        	currentInventorySlot = inventory.getSlotIndex(x);
 	        	if(lastMouseX != x || lastMouseY != y) {
 	        		if(notis != null) {	        			
 		        		frame.remove(notis);
@@ -125,9 +127,9 @@ public class Main {
 	        		}
 	        	}
 	        	if(notis == null) {
-	        		int inventorySize = world.getCurrentChunk().getPlayer()._inventory.items.size();
+	        		int inventorySize = inventory.items.size();
 	        		if(inventorySize >= currentInventorySlot + 1) {
-	        			Item item = world.getCurrentChunk().getPlayer()._inventory.realItems.get(inventorySize - 1 - currentInventorySlot);
+	        			Item item = inventory.realItems.get(inventorySize - 1 - currentInventorySlot);
 		        		notis = new Notification(new Vector2(x,y),  item.getName(), item.getDescription());
 		        		
 		        		lastMouseX = x;
@@ -148,52 +150,11 @@ public class Main {
 	    }
 	}
 	
-	public static boolean isOverInventory(int x, int y) {
-		if((x >= 0 && x <= 322) && (y >= 320 && y <= 352)) {
-			System.out.println("In inventory: " + getSlotIndex(x));
-			return true;
-		}
-		return false;
-	}
-	
-	public static int getSlotIndex(int x) {
-		if(x>=0 && x<=32) {
-			return 0;
-		}
-		else if(x>=32 && x<=64) {
-			return 1;
-		}
-		else if(x>=64 && x<=96) {
-			return 2;
-		}
-		else if(x>=96 && x<=128) {
-			return 3;
-		}
-		else if(x>=128 && x<=160) {
-			return 4;
-		}
-		else if(x>=160 && x<=192) {
-			return 5;
-		}
-		else if(x>=192 && x<=225) {
-			return 6;
-		}
-		else if(x>=225 && x<=258) {
-			return 7;
-		}
-		else if(x>=258 && x<=290) {
-			return 8;
-		}
-		else if(x>=290 && x<=322) {
-			return 9;
-		}
-		return -1;
-	}
-	
 	public static void drawInventory(JFrame frame, Player player) {
 		int x = 0;
-		for (Map.Entry<String, Integer> pair : player._inventory.items.entrySet()) {
-			boolean isSelected = (player._inventory.getSelectedItemIndex() == x);
+		Container inventory = player.getInventory();
+		for (Map.Entry<String, Integer> pair : inventory.items.entrySet()) {
+			boolean isSelected = (inventory.getSelectedItemIndex() == x);
 			
 			Image img = null;
 			try {
@@ -208,8 +169,8 @@ public class Main {
 		    frame.pack();
 		    x++;
 		}
-		for(int i = player._inventory.items.size(); i < player._inventory.getAmountOfSlots(); i++) {
-			boolean isSelected = (player._inventory.getSelectedItemIndex() == i);
+		for(int i = inventory.items.size(); i < inventory.getAmountOfSlots(); i++) {
+			boolean isSelected = (inventory.getSelectedItemIndex() == i);
 			Vector2 position = new Vector2(SCALE_FACTOR*i, SCALE_FACTOR*10);
 			Slot slot = new Slot(position,SCALE_FACTOR,SCALE_FACTOR,"0".toCharArray(),TEXT_COLOR,null,isSelected);
     		frame.add(slot);
@@ -236,10 +197,10 @@ public class Main {
 	    
 	    addDebugText(frame, debugPosX);
 	    addDebugText(frame, debugPosY);
-	    //addDebugText(frame, debugLastPosX);
-	    //addDebugText(frame, debugLastPosY);
-	    //addDebugText(frame, debugChunkPosX);
-	    //addDebugText(frame, debugChunkPosY);
+	    addDebugText(frame, debugLastPosX);
+	    addDebugText(frame, debugLastPosY);
+	    addDebugText(frame, debugChunkPosX);
+	    addDebugText(frame, debugChunkPosY);
 	    
 		frame.repaint();
 	}

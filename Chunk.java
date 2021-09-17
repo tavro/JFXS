@@ -26,14 +26,15 @@ public class Chunk {
 	public static final String PATH_SUFFIX = ".png";        //used for getting png images
 	
 	/* file names */
-	public static final String WALL_IMG = "wall";        	
-	public static final String GROUND_IMG = "ground";      
-	public static final String WATER_IMG = "water"; 
-	public static final String TREE_IMG = "player";
+	public static final String WALL_IMG = PATH_PREFIX + "wall" + PATH_SUFFIX;        	
+	public static final String GROUND_IMG = PATH_PREFIX + "ground" + PATH_SUFFIX;      
+	public static final String WATER_IMG = PATH_PREFIX + "water" + PATH_SUFFIX; 
+	public static final String TREE_IMG = PATH_PREFIX + "tree" + PATH_SUFFIX;
 	
 	Tile[][] map = new Tile[WIDTH][HEIGHT];      
 	
 	private Player player;      
+	private Biome biome;
 	
 	/**
      * Constructor      
@@ -41,6 +42,7 @@ public class Chunk {
      * @param int y, chunk y-position      
      */
 	public Chunk(int x, int y) {
+		biome = new Biome();
 		generateChunk(x,y);
 	}
 	
@@ -54,20 +56,20 @@ public class Chunk {
 			for(int x = 0; x < WIDTH; x++) {
 				Vector2 pos = new Vector2(x,y);
 				double noise = SimplexNoise.noise(x+xOffset*10, y+yOffset*10);
-				if(noise <= WATER_HEIGHT) {
-					Image img = getImage(PATH_PREFIX + WATER_IMG + PATH_SUFFIX);
+				if(noise <= biome.getWaterAmount()) {
+					Image img = getImage(WATER_IMG);
 					map[x][y] = new Tile(pos, true, TileType.WATER, img);
 				}
-				else if(noise >= WALL_HEIGHT) {
-					Image img = getImage(PATH_PREFIX + WALL_IMG + PATH_SUFFIX);
+				else if(noise >= biome.getMountainAmount()) {
+					Image img = getImage(WALL_IMG);
 					map[x][y] = new Tile(pos, true, TileType.WALL, img);
 				}
-				else if(noise >= TREE_HEIGHT) {
-					Image img = getImage(PATH_PREFIX + TREE_IMG + PATH_SUFFIX);
+				else if(noise >= biome.getTreeAmount()) {
+					Image img = getImage(TREE_IMG);
 					map[x][y] = new Tile(pos, true, TileType.TREE, img);
 				}
 				else {
-					Image img = getImage(PATH_PREFIX + GROUND_IMG + PATH_SUFFIX);
+					Image img = getImage(GROUND_IMG);
 					map[x][y] = new Tile(pos, false, TileType.GROUND, img);
 				}
 			}
@@ -119,18 +121,27 @@ public class Chunk {
 		}
 		else {
 			if(tile.getTileType() == TileType.PLAYER) {
-				if(player._inventory.getSelectedItem() == "Pickaxe") {
+				Container inventory = player.getInventory();
+				if(inventory.getSelectedItem() == "Pickaxe") {
 					Tile t = getTile(xPos, yPos);
 					if(t.getTileType() == TileType.WALL) {
 						removeTile(xPos, yPos);
-						player._inventory.addItem(new Item("Stone", "Used for crafting.", "src/stone.png"));
+						
+						Item item = inventory.realItems.get(inventory.getSelectedItemIndex());
+						player.useItem(item);
+						
+						inventory.addItem(new Item("Stone", "Used for crafting.", "src/stone.png"));
 					}
 				}
-				else if(player._inventory.getSelectedItem() == "Axe") {
+				else if(inventory.getSelectedItem() == "Axe") {
 					Tile t = getTile(xPos, yPos);
 					if(t.getTileType() == TileType.TREE) {
 						removeTile(xPos, yPos);
-						player._inventory.addItem(new Item("Wood", "Used for building.", "src/wood.png"));
+						
+						Item item = inventory.realItems.get(inventory.getSelectedItemIndex());
+						player.useItem(item);
+						
+						inventory.addItem(new Item("Wood", "Used for building.", "src/wood.png"));
 					}
 				}
 				removeTile(player.getLastPosition().getX(), player.getLastPosition().getY());
@@ -147,7 +158,7 @@ public class Chunk {
      */
 	public void removeTile(int x, int y) {
 		Vector2 pos = new Vector2(x, y);
-		map[x][y] = new Tile(pos, false, TileType.GROUND, getImage(PATH_PREFIX + GROUND_IMG + PATH_SUFFIX));
+		map[x][y] = new Tile(pos, false, TileType.GROUND, getImage(GROUND_IMG));
 	}
 	
 	/**
